@@ -56,6 +56,9 @@ fprintf('[uo_nn_solve] :::::::::::::::::::::::::::::::::::::::::::::::::::\n')
 % Generate training data set
 %
 fprintf('[uo_nn_solve] Training data set generation.\n')
+[Xtr,ytr]=uo_nn_dataset(te_seed,tr_p,num_target,tr_freq);
+% uo_nn_Xyplot(Xtr,ytr,[])
+
 
 
 %
@@ -63,11 +66,26 @@ fprintf('[uo_nn_solve] Training data set generation.\n')
 %
 fprintf('[uo_nn_solve] Test data set generation.\n');
 
+[Xte,yte]=uo_nn_dataset(tr_seed,te_q,num_target,0);
+% uo_nn_Xyplot(Xte,yte,[])
+
 
 %
 % Optimization
 %
 fprintf('[uo_nn_solve] Optimization\n');
+
+if isd==1
+    % Run Gradient Method (GM) to find w*
+    w_opt = GM(Xtr, ytr, [0],la,epsG,kmax,ils,ialmax, kmaxBLS,epsal,c1,c2);
+
+else if isd==2
+    % Run Quasi-Newton Method (QNM) to find w*
+    w_opt = QNM(Xtr, ytr, w0, lambda, epsG, kmax, c1, c2, alpha_max);
+
+     
+
+
 
 %
 % Training accuracy
