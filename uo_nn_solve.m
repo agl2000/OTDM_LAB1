@@ -79,18 +79,18 @@ w0= rand(size(Xtr, 1), 1);
 fprintf('[uo_nn_solve] Optimization\n');
 
 if isd==1
-    % Run Gradient Method (GM) to find w*
+    fprintf('Run Gradient Method (GM) to find w*\n')
     [w_opt,iout] = GM(Xtr, ytr, w0,la,epsG,kmax,ils,ialmax, kmaxBLS,epsal,c1,c2);
 
 elseif isd==2
-    % Run Quasi-Newton Method (QNM) to find w*
-    %w_opt = QNM(Xtr, ytr, w0, lambda, epsG, kmax, c1, c2, alpha_max);
+    fprintf('Run Quasi-Newton Method (QNM) to find w*\n')
+    [w_opt,iout] = QNM(Xtr,ytr,w0,la,epsG,kmax,ils,ialmax,kmaxBLS,epsal,c1,c2);
 
 else 
-    %Run Stochastic Gradient Method (SGM) to find w*
+    fprintf('Run Stochastic Gradient Method (SGM) to find w*\n')
 
 end
-fprintf('HOLA');
+
 
 
 
@@ -100,7 +100,7 @@ fprintf('HOLA');
 fprintf('[uo_nn_solve] Training Accuracy.\n');
 
 
-uo_nn_Xyplot(Xtr,ytr,[w_opt]);
+% uo_nn_Xyplot(Xtr,ytr,[w_opt]);
 sigmoid = @(z) 1 ./ (1 + exp(-z));
 y_pred_train = sigmoid(w_opt' * sigmoid(Xtr));  % Use w_opt_GM or w_opt_QNM
 y_pred_train = y_pred_train >= 0.5;  % Threshold at 0.5 for binary classification
@@ -115,7 +115,7 @@ accuracy_train = mean(y_pred_train == ytr) * 100;
 %
 fprintf('[uo_nn_solve] Test Accuracy.\n');
 
-uo_nn_Xyplot(Xte,yte,[w_opt]);
+% uo_nn_Xyplot(Xte,yte,[w_opt]);
 y_pred_test = sigmoid(w_opt' * sigmoid(Xte)); 
 y_pred_test = y_pred_test >= 0.5;  % Threshold at 0.5 for binary classification
 

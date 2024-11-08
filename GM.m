@@ -11,7 +11,11 @@ function [w_opt,iout]=GM(Xtr,ytr,w0,la,epsG, kmax,ils,ialmax,kmaxBLS,epsal, c1, 
         if norm(grad) < epsG
             break;
         end
-        [alpha, iout] = uo_BLSNW32(@(w) L(w, Xtr, ytr), @(w) gL(w, Xtr, ytr), w, -grad, alpha_max, c1, c2, kmaxBLS, epsal,ialmax);
+        if ils==1
+        elseif ils==2
+        else
+            [alpha, iout] = uo_BLSNW32(@(w) L(w, Xtr, ytr), @(w) gL(w, Xtr, ytr), w, -grad, alpha_max, c1, c2, kmaxBLS, epsal,ialmax);
+        end
         w = w - alpha * grad;
     end
     w_opt = w;
