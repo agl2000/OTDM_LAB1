@@ -1,5 +1,5 @@
-function [w_opt]=GM(Xtr,ytr,w0,la,epsG, kmax,ils,ialmax,kmaxBLS,epsal, c1, c2, alpha_max)
-
+function [w_opt,iout]=GM(Xtr,ytr,w0,la,epsG, kmax,ils,ialmax,kmaxBLS,epsal, c1, c2)
+    alpha_max= 1.0; 
     sig = @(Xtr) 1./(1+exp(-Xtr));
     y = @(Xtr,w ) sig (w'*sig(Xtr));
     L = @(w,Xtr,ytr) (norm(y(Xtr,w)-ytr)^2)/size(ytr,2) + (la*norm (w)^2)/2;

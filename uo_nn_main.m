@@ -37,6 +37,8 @@ fprintf(' wall time = %6.1d s.\n', etime(t2,t1));
 
 
 
+
+
 %Calculations:
 % sig = @(Xtr) 1./(1+exp(-Xtr));
 % y = @(Xtr,w ) sig (w'*sig(Xtr));
