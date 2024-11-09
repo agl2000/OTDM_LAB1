@@ -2,16 +2,9 @@ clear;
 %
 % Parameters for dataset generation
 %
-
-% num_target =[8];
-% tr_freq    = .5;        
-% tr_p       = 250;       
-% te_q       = 250;       
-% tr_seed    = 590152;    
-% te_seed    = 590100;    
-num_target =[1,3,5,7,9];
+num_target =[1, 3, 5, 7, 9];
 tr_freq    = .5;        
-tr_p       = 250;  
+tr_p       = 250;       
 te_q       = 250;       
 tr_seed    = 48043775;    
 te_seed    = 38877082;    
@@ -21,8 +14,7 @@ te_seed    = 38877082;
 la = 0;                                                      % L2 regularization.
 epsG = 10^-6; kmax = 10000;                                   % Stopping criterium.
 ils=3; ialmax = 2; kmaxBLS=30; epsal=10^-3;c1=0.01; c2=0.45;  % Linesearch.
-isd = 1; icg = 2; irc = 2 ; nu = 1.0;                         % Search direction.
-
+isd = 3; icg = 2; irc = 2 ; nu = 1.0;                         % Search direction.
 sg_seed = 565544; sg_al0 = 2; sg_be = 0.3; sg_ga = 0.01;      % SGM iteration.
 sg_emax = kmax; sg_ebest = floor(0.01*sg_emax);               % SGM stopping condition.
 %
@@ -35,19 +27,7 @@ fprintf(' wall time = %6.1d s.\n', etime(t2,t1));
 fprintf("\n");
 fprintf("%d", niter);
 fprintf("Train acc: %f Test acc: %f\n", tr_acc, te_acc);
+
 %
-
-%uo_nn_Xyplot(Xtr,ytr,[wo]);
-%uo_nn_Xyplot(Xte,yte,[wo]);
-
-
-
-
-
-%Calculations:
-% sig = @(Xtr) 1./(1+exp(-Xtr));
-% y = @(Xtr,w ) sig (w'*sig(Xtr));
-% L = @(w,Xtr,ytr) (norm(y(Xtr,w)-ytr)^2)/size(ytr,2) + (la*norm (w)^2)/2;
-% gL = @(w,Xtr,ytr) (2*sig(Xtr)*((y(Xtr, w)-ytr) .*y(Xtr, w) .* (1-y(Xtr,w)))')/size (ytr,2)+la*w;
 
 
