@@ -198,10 +198,10 @@ accuracy_test = mean(y_pred_test == yte) * 100;
 %ytr=ytr;
 wo=w_opt;
 %fo?
-tr_acc=accuracy_train;
+tr_acc=accuracy_train
 % Xte=Xte;
 % yte=yte;
-te_acc=accuracy_test;
+te_acc=accuracy_test
 niter=iout;
 tex=toc;
 

@@ -9,7 +9,7 @@ clear;
 % te_q       = 250;       
 % tr_seed    = 590152;    
 % te_seed    = 590100;    
-num_target =[1,3,5,7,9];
+num_target =[1];
 tr_freq    = .5;        
 tr_p       = 250;  
 te_q       = 250;       

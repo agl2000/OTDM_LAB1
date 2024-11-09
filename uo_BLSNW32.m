@@ -47,7 +47,7 @@ while (1 ~= 2 && i < maxiter)
     fxx = f(xx);
     gxx = g(xx)*d;
   %>
-    if (fxx > fx0 + c1*alphax*gx0) || ((i > 1) && fxx >= fxp)
+    if (fxx > fx0 + c1*alphax*gx0) || ((i > 1) && fxx >= fxp),
         [alphas,iout_zoom] = zoom(f,g,x0,d,alphap,alphax,c1,c2,eps);
         %<fjh
         if iout_zoom == 2
@@ -71,8 +71,8 @@ while (1 ~= 2 && i < maxiter)
   end
   alphap = alphax;
 
-  % %modify the update of alpham, now with formula 2
-  % 
+  %modify the update of alpham, now with formula 2
+
   % if ialmax == 1
   %   % Formula 1
   %   alpham = alpham * (gxp / gxx);

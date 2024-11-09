@@ -16,8 +16,11 @@ global iheader; iheader = 1;
 csvfile = strcat('uo_nn_batch_',num2str(tr_seed),'-',num2str(te_seed),'-',num2str(sg_seed),'.csv');
 fileID = fopen(csvfile ,'w');
 t1=clock;
-for num_target = [1:10]
-    for la = [0.0, 0.01, 0.1]
+% for num_target = [1:10]
+%     for la = [0.0, 0.01, 0.1]
+%         for isd = [1,2,3]
+for num_target = [1,2]
+    for la = [0.0,0.01]
         for isd = [1,2,3]
             [Xtr,ytr,wo,fo,tr_acc,Xte,yte,te_acc,niter,tex]=uo_nn_solve(num_target,tr_freq,tr_seed,tr_p,te_seed,te_q,la,epsG,kmax,ils,ialmax,kmaxBLS,epsal,c1,c2,isd,sg_al0,sg_be,sg_ga,sg_emax,sg_ebest,sg_seed,icg,irc,nu);
             if iheader == 1
