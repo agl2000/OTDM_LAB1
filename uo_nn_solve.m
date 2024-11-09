@@ -47,6 +47,11 @@ tic
 
 Xtr= 0; ytr= 0; wo= 0; fo= 0; tr_acc= 0; Xte= 0; yte= 0; te_acc= 0; niter= 0; tex= 0;
 
+sig = @(Xtr) 1./(1+exp(-Xtr ...
+    ));
+y = @(Xtr,w ) sig (w'*sig(Xtr));
+L = @(w,Xtr,ytr) (norm(y(Xtr,w)-ytr)^2)/size(ytr,2) + (la*norm (w)^2)/2;
+
 fprintf('[uo_nn_solve] :::::::::::::::::::::::::::::::::::::::::::::::::::\n')
 fprintf('[uo_nn_solve] Pattern recognition with neural networks.\n')
 fprintf('[uo_nn_solve] %s\n',datetime)
@@ -81,10 +86,12 @@ fprintf('[uo_nn_solve] Optimization\n');
 if isd==1
     fprintf('Run Gradient Method (GM) to find w*\n')
     [w_opt,iout] = GM(Xtr, ytr, w0,la,epsG,kmax,ils,ialmax, kmaxBLS,epsal,c1,c2);
+    fo=L(w_opt, Xtr, ytr);
 
 elseif isd==2
     fprintf('Run Quasi-Newton Method (QNM) to find w*\n')
     [w_opt,iout] = QNM(Xtr,ytr,w0,la,epsG,kmax,ils,ialmax,kmaxBLS,epsal,c1,c2);
+    fo=L(w_opt, Xtr, ytr);
 
 else 
     fprintf('Run Stochastic Gradient Method (SGM) to find w*\n')
