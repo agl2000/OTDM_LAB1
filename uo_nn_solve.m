@@ -47,87 +47,73 @@ tic
 %    tex : total running time (see "tic" "toc" Matlab commands).
 %
 
-%<<<<<<< Arnau
-
-
-%% Generate Training data and test dataset
-
-
-[Xtr,ytr] = uo_nn_dataset(tr_seed, tr_p, num_target, tr_freq);
-[Xte, yte] = uo_nn_dataset(te_seed,te_q, num_target, 0);
-
 % find and minimize L(w,Xtr, ytr, lambda)
 sig = @(Xtr) 1./(1+exp(-Xtr));
 y = @(Xtr,w) sig(w'*sig(Xtr));
 L = @(w,Xtr,ytr) (norm(y(Xtr,w)-ytr)^2)/size(ytr,2) + (la*norm(w)^2)/2;
 gL= @(w,Xtr,ytr) (2*sig(Xtr)*((y(Xtr,w)-ytr).*y(Xtr,w).*(1-y(Xtr,w)))')/size(ytr,2)+la*w;
 
-% Find values w* 
 
-t1=clock;
+%Xtr= 0; ytr= 0; wo= 0; fo= 0; tr_acc= 0; Xte= 0; yte= 0; te_acc= 0; niter= 0; tex= 0;
 
-k = 1; % set iterations to 0
-
-
-w0 = zeros(35,1);
-w = w0;
-%Hk = {};
-xk = [w0]; 
-alk = []; 
-dk = []; 
-
-if isd == 1
-
-
-%%% Gradient Method
-    while norm(gL(w, Xtr, ytr)) >= epsG && k <= kmax
-      
-        d = -gL(w, Xtr, ytr); 
-
-        dk = [dk, d];
-       
-        if k > 1
-           % ialmax = alk(k-1)*(dot(gL(xk(:,k-1), Xtr, ytr), dk(:,k-1)))/ (dot(gL(w, Xtr, ytr), d));
-           almax = (2*(L(w, Xtr, ytr)-L(xk(:,k-1), Xtr, ytr)))/(dot(gL(w, Xtr, ytr), d));
-        else 
-            almax = 1;
-        end
-        %fprintf("%d\n", k);
-        
-
-
-        [al,iWv] = uo_BLSNW32(L,gL, w, Xtr, ytr, d, almax,c1,c2,kmaxBLS,epsal);
-        
-        
-
-        w = w + al*d; k = k+1; % GM iteration
-        %fprintf("%f \n", w);
-
-        % all the k+1 things
-        xk = [xk,w]; 
-        alk = [alk, al];
-       
-    
-    end
-    wo = w;
+fprintf('[uo_nn_solve] :::::::::::::::::::::::::::::::::::::::::::::::::::\n')
+fprintf('[uo_nn_solve] Pattern recognition with neural networks.\n')
+fprintf('[uo_nn_solve] %s\n',datetime)
+fprintf('[uo_nn_solve] :::::::::::::::::::::::::::::::::::::::::::::::::::\n')
 
 
 
-elseif isd == 7
 
 
-    
+%
+% Generate training data set
+%
+fprintf('[uo_nn_solve] Training data set generation.\n')
+[Xtr,ytr] = uo_nn_dataset(tr_seed, tr_p, num_target, tr_freq);
+% uo_nn_Xyplot(Xtr,ytr,[])
+
+
+
+%
+% Generate test data set
+%
+fprintf('[uo_nn_solve] Test data set generation.\n');
+[Xte, yte] = uo_nn_dataset(te_seed,te_q, num_target, 0);
+
+% uo_nn_Xyplot(Xte,yte,[])
+
+
+%
+% Optimization
+%
+
+
+w0= rand(size(Xtr, 1), 1);
+fprintf('[uo_nn_solve] Optimization\n');
+
+if isd==1
+    fprintf('Run Gradient Method (GM) to find w*\n')
+    [w_opt,iout] = GM(Xtr, ytr, w0,la,epsG,kmax,ils,ialmax, kmaxBLS,epsal,c1,c2);
+    fo=L(w_opt, Xtr, ytr);
+
+elseif isd==2
+    fprintf('Run Quasi-Newton Method (QNM) to find w*\n')
+    [w_opt,iout] = QNM(Xtr,ytr,w0,la,epsG,kmax,ils,ialmax,kmaxBLS,epsal,c1,c2);
+    fo=L(w_opt, Xtr, ytr);
+
+else 
+    fprintf('Run Stochastic Gradient Method (SGM) to find w*\n')
     % Stochastic gradient method
-    
     [alef, bet] = size(Xtr);
     p = bet;
     m = floor(p*sg_ga);
-    sg_k = ceil(p/m);
+    %sg_k = ceil(p/m);
     sg_kmax  = sg_emax;
     e = 0;
     s = 0;
     l_te_best = +Inf;
     k = 0;
+    w = w0;
     sg_al = 0.01*sg_al0; % for learning rate ak
     sg_k = floor(sg_be*sg_kmax); %for learning rate ak
 
@@ -160,117 +146,16 @@ elseif isd == 7
         %fprintf("%f %f\n", l_te, l_te_best);
         if l_te <  l_te_best
             l_te_best = l_te;
-            wo = w;
+            w_opt = w;
             s = 0;
         else
             s = s+1;
         end 
         
     end 
+    fo=L(w_opt, Xtr, ytr);
+    iout=k;
 
-elseif isd == 3
-    % Quasi Newton with BFGS
-    I = eye(length(w));
-    h=I;
-    wantic = -1;
-    %fprintf("%d\n", size(gL(w,Xtr,ytr)));
-    while norm(gL(w, Xtr, ytr)) >= epsG && k <= kmax
-        
-        d = -(h*gL(w, Xtr, ytr));
-
-        if k > 1
-           % ialmax = alk(k-1)*(dot(gL(xk(:,k-1), Xtr, ytr), dk(:,k-1)))/ (dot(gL(w, Xtr, ytr), d));
-           almax = (2*(L(w, Xtr, ytr)-L(xk(:,k-1), Xtr, ytr)))/(dot(gL(w, Xtr, ytr), d));
-        else 
-            almax = 1;
-           
-        end
-
-        [al,iWv] = uo_BLSNW32(L,gL,w, Xtr, ytr,d, almax,c1,c2,kmaxBLS,epsal);
-
-        wantic = w;
-        w = w + al*d;
-        k = k+1;
-        
-
-        s = w-wantic ;
-        yk = gL(w, Xtr, ytr)- gL(wantic, Xtr, ytr);
-        rh = 1 / (yk'*s);
-     
-        h = (I - rh*s*yk')*h*(I-rh*yk*s') + rh*s*s';
-     
-        xk = [xk,w]; 
-        alk = [alk, al];
-        % update all param:
-        %xk = [xk,x]; fk = [fk,f(x)]; gk = [gk,g(x)];  Hk{end+1} = h;
-    
-    end
-
-    wo = w;
-  
-end 
-
-
-% Part 3 Training and test Accuracy
-
-fo = L(wo, Xtr, ytr);
-
-
-y_f = y(Xtr, wo);
-
-v1 = eq(round(y_f),ytr);
-v2 = eq(round(y(Xte,wo)),yte);
-tr_acc = (100/tr_p)*sum(v1);
-te_acc = (100/te_q)*sum(v2);
-
-niter = k;
-
-t2=clock;
-tex = etime(t2,t1);
-%=======
-Xtr= 0; ytr= 0; wo= 0; fo= 0; tr_acc= 0; Xte= 0; yte= 0; te_acc= 0; niter= 0; tex= 0;
-
-fprintf('[uo_nn_solve] :::::::::::::::::::::::::::::::::::::::::::::::::::\n')
-fprintf('[uo_nn_solve] Pattern recognition with neural networks.\n')
-fprintf('[uo_nn_solve] %s\n',datetime)
-fprintf('[uo_nn_solve] :::::::::::::::::::::::::::::::::::::::::::::::::::\n')
-
-%
-% Generate training data set
-%
-fprintf('[uo_nn_solve] Training data set generation.\n')
-[Xtr,ytr]=uo_nn_dataset(te_seed,tr_p,num_target,tr_freq);
-% uo_nn_Xyplot(Xtr,ytr,[])
-
-
-
-%
-% Generate test data set
-%
-fprintf('[uo_nn_solve] Test data set generation.\n');
-
-[Xte,yte]=uo_nn_dataset(tr_seed,te_q,num_target,0);
-% uo_nn_Xyplot(Xte,yte,[])
-
-
-%
-% Optimization
-%
-
-
-w0= rand(size(Xtr, 1), 1);
-fprintf('[uo_nn_solve] Optimization\n');
-
-if isd==1
-    fprintf('Run Gradient Method (GM) to find w*\n')
-    [w_opt,iout] = GM(Xtr, ytr, w0,la,epsG,kmax,ils,ialmax, kmaxBLS,epsal,c1,c2);
-
-elseif isd==2
-    fprintf('Run Quasi-Newton Method (QNM) to find w*\n')
-    [w_opt,iout] = QNM(Xtr,ytr,w0,la,epsG,kmax,ils,ialmax,kmaxBLS,epsal,c1,c2);
-
-else 
-    fprintf('Run Stochastic Gradient Method (SGM) to find w*\n')
 
 end
 
@@ -281,6 +166,7 @@ end
 % Training accuracy
 %
 fprintf('[uo_nn_solve] Training Accuracy.\n');
+
 
 
 % uo_nn_Xyplot(Xtr,ytr,[w_opt]);
@@ -317,9 +203,92 @@ tr_acc=accuracy_train;
 te_acc=accuracy_test;
 niter=iout;
 tex=toc;
-%>>>>>>> main
+
 
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % End Procedure uo_nn_solve
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+% 
+% 
+% %%% Gradient Method
+%     while norm(gL(w, Xtr, ytr)) >= epsG && k <= kmax
+% 
+%         d = -gL(w, Xtr, ytr); 
+% 
+%         dk = [dk, d];
+% 
+%         if k > 1
+%            % ialmax = alk(k-1)*(dot(gL(xk(:,k-1), Xtr, ytr), dk(:,k-1)))/ (dot(gL(w, Xtr, ytr), d));
+%            almax = (2*(L(w, Xtr, ytr)-L(xk(:,k-1), Xtr, ytr)))/(dot(gL(w, Xtr, ytr), d));
+%         else 
+%             almax = 1;
+%         end
+%         %fprintf("%d\n", k);
+% 
+% 
+% 
+%         [al,iWv] = uo_BLSNW32(L,gL, w, Xtr, ytr, d, almax,c1,c2,kmaxBLS,epsal);
+% 
+% 
+% 
+%         w = w + al*d; k = k+1; % GM iteration
+%         %fprintf("%f \n", w);
+% 
+%         % all the k+1 things
+%         xk = [xk,w]; 
+%         alk = [alk, al];
+% 
+% 
+%     end
+%     wo = w;
+% 
+% 
+% 
+% 
+% 
+% 
+%     % Quasi Newton with BFGS
+%     I = eye(length(w));
+%     h=I;
+%     wantic = -1;
+%     %fprintf("%d\n", size(gL(w,Xtr,ytr)));
+%     while norm(gL(w, Xtr, ytr)) >= epsG && k <= kmax
+% 
+%         d = -(h*gL(w, Xtr, ytr));
+% 
+%         if k > 1
+%            % ialmax = alk(k-1)*(dot(gL(xk(:,k-1), Xtr, ytr), dk(:,k-1)))/ (dot(gL(w, Xtr, ytr), d));
+%            almax = (2*(L(w, Xtr, ytr)-L(xk(:,k-1), Xtr, ytr)))/(dot(gL(w, Xtr, ytr), d));
+%         else 
+%             almax = 1;
+% 
+%         end
+% 
+%         [al,iWv] = uo_BLSNW32(L,gL,w, Xtr, ytr,d, almax,c1,c2,kmaxBLS,epsal);
+% 
+%         wantic = w;
+%         w = w + al*d;
+%         k = k+1;
+% 
+% 
+%         s = w-wantic ;
+%         yk = gL(w, Xtr, ytr)- gL(wantic, Xtr, ytr);
+%         rh = 1 / (yk'*s);
+% 
+%         h = (I - rh*s*yk')*h*(I-rh*yk*s') + rh*s*s';
+% 
+%         xk = [xk,w]; 
+%         alk = [alk, al];
+%         % update all param:
+%         %xk = [xk,x]; fk = [fk,f(x)]; gk = [gk,g(x)];  Hk{end+1} = h;
+% 
+%     end
+% 
+%     wo = w;
+% 
