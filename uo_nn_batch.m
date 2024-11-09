@@ -2,7 +2,7 @@ clear;
 %
 % Parameters.
 %
-tr_seed = 123456; te_seed = 789101; sg_seed = 565544;         % Seeds.
+tr_seed = 48043775; te_seed = 38877082; sg_seed = 565544;         % Seeds.
 tr_p = 250; te_q = 250; tr_freq = 0.5;                        % Datasets generation.
 epsG = 10^-6; kmax = 1000;                                    % Stopping condition.
 ils=3; ialmax = 1; kmaxBLS=30; epsal=10^-3; c1=0.01; c2=0.45; % Linesearch.
@@ -32,3 +32,4 @@ t2=clock;
 total_t = etime(t2,t1);
 fprintf(' wall time = %6.1d s.\n', total_t);
 fclose(fileID);
+uo_nn_batch_BP_log(tr_seed,te_seed,sg_seed, total_t, csvfile);
