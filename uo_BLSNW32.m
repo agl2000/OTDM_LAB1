@@ -12,7 +12,7 @@ function [alphas,iout] = uo_BLSNW32(f,g0,x0,d,alpham,c1,c2,maxiter,eps)
 
 alpha0 = 0;
 alphap = alpha0;
-g = @(x) g0(x)';
+g = @(w, X, y) g0(w, X, y);
 %<fjh
 iout = 0;
 if c1 == 0
@@ -21,10 +21,12 @@ end
 if c2==0
     c2 = 0.5;
 end
-alphax = alpham*rand(1);
+%alphax = alpham*rand(1);
+alphax=alpham
 %[fx0,gx0] = feval(f,x0,d);
-fx0 = f(x0);
-gx0 = g(x0)*d;
+fx0 = f(w0, X, y);
+gx0 = dot(g(w0, X, y),d);
+
 %>
 fxp = fx0;
 gxp = gx0;
@@ -39,14 +41,14 @@ while (1 ~= 2 && i < maxiter)
       return
     end
   %>
-    xx = x0 + alphax*d;
+    ww = w0 + alphax*d;
   %<fjh
   %[fxx,gxx] = feval(f,xx,d);
-    fxx = f(xx);
-    gxx = g(xx)*d;
+    fxx = f(ww, X, y);
+    gxx = dot(g(ww, X, y),d)
   %>
     if (fxx > fx0 + c1*alphax*gx0) || ((i > 1) && (fxx >= fxp)),
-    [alphas,iout_zoom] = zoom(f,g,x0,d,alphap,alphax,c1,c2,eps);
+    [alphas,iout_zoom] = zoom(f,g,w0, X,y, d,alphap,alphax,c1,c2,eps);
     %<fjh
     if iout_zoom == 2
         iout = 2;
@@ -59,7 +61,7 @@ while (1 ~= 2 && i < maxiter)
     return;
   end
   if gxx >= 0,
-    [alphas,iout_zoom] = zoom(f,g,x0,d,alphax,alphap,c1,c2,eps);
+     [alphas,iout_zoom] = zoom(f,g,w0, X, y, d,alphax,alphap,c1,c2,eps);
     %<fjh
     if iout_zoom == 2
         iout = 2;
@@ -78,7 +80,7 @@ if i==maxiter
     alphas = alphax;
 end
 
-function [alphas,iout] = zoom(f,g,x0,d,alphal,alphah,c1,c2,eps)
+function [alphas,iout] = zoom(f,g,w0, X, y, d,alphal,alphah,c1,c2,eps)
 % function alphas = zoom(f,g,x0,d,alphal,alphah)
 % Algorithm 3.6 on page 61 in Nocedal and Wright
 % MATLAB code by Kartik Sivaramakrishnan
@@ -87,8 +89,8 @@ function [alphas,iout] = zoom(f,g,x0,d,alphal,alphah,c1,c2,eps)
 
 %<fjh
 %[fx0,gx0] = feval(f,x0,d);
-fx0 = f(x0);
-gx0 = g(x0)*d;
+fx0 = f(w0, X, y);
+gx0 = dot(g(w0, X, y),d);
 iout = 0;
 %>
 while (1~=2),
@@ -101,16 +103,16 @@ while (1~=2),
     %>
 
    alphax = 1/2*(alphal+alphah);
-   xx = x0 + alphax*d;
+   ww = w0 + alphax*d;
    %<fjh
    %[fxx,gxx] = feval(f,xx,d);
-   fxx = f(xx);
-   gxx = g(xx)*d;
+   fxx = f(ww, X, y);
+   gxx = dot(g(ww, X, y),d);
    %>
-   xl = x0 + alphal*d;
+   wl = w0 + alphal*d;
    %<fjh
    %fxl = feval(f,xl,d);
-   fxl = f(xl);
+   fxl = f(wl, X, y);
    %>
    if ((fxx > fx0 + c1*alphax*gx0) || (fxx >= fxl)),
       alphah = alphax;
