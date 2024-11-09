@@ -71,15 +71,15 @@ while (1 ~= 2 && i < maxiter)
   end
   alphap = alphax;
 
-  %modify the update of alpham, now with formula 2
-  
-  if ialmax == 1
-    % Formula 1
-    alpham = alpham * (gxp / gxx);
-  else
-    % Formula 2
-    alpham = (2 * (fxx - fxp)) / gxx; 
-  end
+  % %modify the update of alpham, now with formula 2
+  % 
+  % if ialmax == 1
+  %   % Formula 1
+  %   alpham = alpham * (gxp / gxx);
+  % else
+  %   % Formula 2
+  %   alpham = (2 * (fxx - fxp)) / gxx; 
+  % end
 
   fxp = fxx;
   gxp = gxx;
