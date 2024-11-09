@@ -56,10 +56,6 @@ gL= @(w,Xtr,ytr) (2*sig(Xtr)*((y(Xtr,w)-ytr).*y(Xtr,w).*(1-y(Xtr,w)))')/size(ytr
 
 %Xtr= 0; ytr= 0; wo= 0; fo= 0; tr_acc= 0; Xte= 0; yte= 0; te_acc= 0; niter= 0; tex= 0;
 
-sig = @(Xtr) 1./(1+exp(-Xtr ...
-    ));
-y = @(Xtr,w ) sig (w'*sig(Xtr));
-L = @(w,Xtr,ytr) (norm(y(Xtr,w)-ytr)^2)/size(ytr,2) + (la*norm (w)^2)/2;
 
 fprintf('[uo_nn_solve] :::::::::::::::::::::::::::::::::::::::::::::::::::\n')
 fprintf('[uo_nn_solve] Pattern recognition with neural networks.\n')
