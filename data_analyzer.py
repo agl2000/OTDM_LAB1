@@ -4,7 +4,8 @@ import pandas as pd
 data = pd.read_csv('uo_nn_batch_123456-789101-565544.csv', delimiter=';', skipinitialspace=True)
 
 #delete the last column
-data=data[,1:8]
+
+
 print(data)
 
 # # Rename columns for easier access
