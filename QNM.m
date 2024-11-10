@@ -5,12 +5,12 @@ function [w_opt, iout] = QNM(Xtr, ytr, w0, la, epsG, kmax, ils, ialmax, kmaxBLS,
     L = @(w,Xtr,ytr) (norm(y(Xtr,w)-ytr)^2)/size(ytr,2) + (la*norm(w)^2)/2;
     gL= @(w,Xtr,ytr) (2*sig(Xtr)*((y(Xtr,w)-ytr).*y(Xtr,w).*(1-y(Xtr,w)))')/size(ytr,2)+la*w;
 
+
     w = w0;
     I=eye(length(w0));
     H = I;  % Initial inverse Hessian approximation
-    
+    grad = gL(w, Xtr, ytr);
     for k = 1:kmax
-        grad = gL(w, Xtr, ytr);
         if norm(grad) < epsG
             break;
         end
@@ -30,13 +30,14 @@ function [w_opt, iout] = QNM(Xtr, ytr, w0, la, epsG, kmax, ils, ialmax, kmaxBLS,
         % Update the inverse Hessian matrix H using the BFGS formula
         s = w_new - w;
         y = grad_new - grad;
-        rho = 1 / (y' * s); 
+        rho = 1 / (y' * s);
         
         % BFGS update to H
         H = (I - rho * s * y') * H * (I - rho * y * s') + rho * s * s';
         
         % Move to new weights for the next iteration
         w = w_new;
+        grad=grad_new;
     end
     
     % Final output assignment

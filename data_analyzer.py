@@ -52,3 +52,36 @@ plt.xlabel('Lambda')
 plt.ylabel('Number of Iterations')
 plt.legend(title='ISD')
 plt.show()
+
+# Create a boxplot for number of iterations only for isd = 1
+plt.figure(figsize=(12, 6))
+sns.boxplot(x='lambda', y='niter', data=data[data['isd'] == 1])
+plt.title('Number of Iterations by Lambda')
+plt.xlabel('Lambda')
+plt.ylabel('Number of Iterations')
+plt.show()
+
+# Create a boxplot for number of iterations only for isd = 2
+plt.figure(figsize=(12, 6))
+sns.boxplot(x='lambda', y='niter', data=data[data['isd'] == 2])
+plt.title('Number of Iterations by Lambda')
+plt.xlabel('Lambda')
+plt.ylabel('Number of Iterations')
+plt.show()
+
+# Create a boxplot for number of iterations only for isd = 3
+plt.figure(figsize=(12, 6))
+sns.boxplot(x='lambda', y='niter', data=data[data['isd'] == 3])
+plt.title('Number of Iterations by Lambda')
+plt.xlabel('Lambda')
+plt.ylabel('Number of Iterations')
+plt.show()
+
+#Create a boxplot for L*
+plt.figure(figsize=(12, 6))
+sns.boxplot(x='lambda', y='L*', hue='isd', data=data)
+plt.title('L* by Lambda and ISD')
+plt.xlabel('Lambda')
+plt.ylabel('L*')
+plt.legend(title='ISD')
+plt.show()

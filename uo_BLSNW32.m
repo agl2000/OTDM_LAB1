@@ -48,6 +48,7 @@ while (1 ~= 2 && i < maxiter)
     gxx = g(xx)*d;
   %>
     if (fxx > fx0 + c1*alphax*gx0) || ((i > 1) && fxx >= fxp),
+        
         [alphas,iout_zoom] = zoom(f,g,x0,d,alphap,alphax,c1,c2,eps);
         %<fjh
         if iout_zoom == 2
@@ -57,6 +58,7 @@ while (1 ~= 2 && i < maxiter)
         return;
     end
   if abs(gxx) <= -c2*gx0,
+    
     alphas = alphax;
     return;
   end
