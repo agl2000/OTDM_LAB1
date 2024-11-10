@@ -3,17 +3,34 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # Load the CSV data
-data = pd.read_csv('uo_nn_batch_48043775-38877082-565544.csv', delimiter=';', skipinitialspace=True)
+data = pd.read_csv('uo_nn_batch_48043775-38877082-565544_report2.csv', delimiter=';', skipinitialspace=True)
 
 #delete the last column
 data = data.iloc[:, :-1]
 
 
 
-print(data)
+# print(data)
 
 # # Rename columns for easier access
 data.columns = ['num_target', 'lambda', 'isd', 'niter', 'tex', 'tr_acc', 'te_acc', 'L*']
+
+
+
+
+
+# join two csv with the same structure
+data2 = pd.read_csv('uo_nn_batch_48043775-38877082-565544.csv', delimiter=';', skipinitialspace=True)
+data2 = data2.iloc[:, :-1]
+data2.columns = ['num_target', 'lambda', 'isd', 'niter', 'tex', 'tr_acc', 'te_acc', 'L*']
+
+data = pd.concat([data, data2])
+
+print(data)
+
+#delete all the rows that lambda = 0.00 and isd = 3
+data = data[(data['lambda'] != 0.00) | (data['isd'] != 3)]
+print(data)
 
 
 
